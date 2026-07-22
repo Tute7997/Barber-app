@@ -5,6 +5,29 @@ import { SERVICES, PROMOS, findPriceRow } from '../lib/priceConstants'
 
 const MESSAGE_TIMEOUT_MS = 2500
 
+function sanitizePriceInput(raw) {
+  const cleaned = raw.replace(/[^0-9.]/g, '')
+  const [intPart, ...rest] = cleaned.split('.')
+  if (rest.length === 0) return intPart
+  return `${intPart}.${rest.join('').slice(0, 2)}`
+}
+
+function PriceInput({ row, onChange }) {
+  if (!row) return null
+  return (
+    <div className="relative w-28">
+      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-accent/50">$</span>
+      <input
+        type="text"
+        inputMode="decimal"
+        value={row.price ?? ''}
+        onChange={(e) => onChange(row.id, e.target.value)}
+        className="w-full rounded-lg border border-accent/15 bg-white py-2 pl-7 pr-3 text-right font-medium text-accent focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+      />
+    </div>
+  )
+}
+
 export default function PricesPage() {
   const [prices, setPrices] = useState([])
   const [savedPrices, setSavedPrices] = useState([])
@@ -54,8 +77,10 @@ export default function PricesPage() {
   function handlePriceChange(rowId, rawValue) {
     if (rowId === undefined || rowId === null) return
 
+    const sanitized = sanitizePriceInput(rawValue)
+
     setPrices((prev) =>
-      prev.map((row) => (row.id === rowId ? { ...row, price: rawValue } : row)),
+      prev.map((row) => (row.id === rowId ? { ...row, price: sanitized } : row)),
     )
   }
 
@@ -91,23 +116,6 @@ export default function PricesPage() {
     setPrices(savedSnapshot)
     setSavedPrices(savedSnapshot)
     flashSuccess('Cambios guardados correctamente')
-  }
-
-  function PriceInput({ row }) {
-    if (!row) return null
-    return (
-      <div className="relative w-28">
-        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-accent/50">$</span>
-        <input
-          type="number"
-          step="0.01"
-          min="0"
-          value={row.price ?? ''}
-          onChange={(e) => handlePriceChange(row.id, e.target.value)}
-          className="w-full rounded-lg border border-accent/15 bg-white py-2 pl-7 pr-3 text-right font-medium text-accent focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-        />
-      </div>
-    )
   }
 
   return (
@@ -146,7 +154,7 @@ export default function PricesPage() {
                   return (
                     <div key={key} className="flex items-center justify-between gap-4 p-4">
                       <span className="font-medium text-accent">{label}</span>
-                      <PriceInput row={row} />
+                      <PriceInput row={row} onChange={handlePriceChange} />
                     </div>
                   )
                 })}
@@ -183,7 +191,7 @@ export default function PricesPage() {
                               <span className="text-sm font-medium text-accent">
                                 {serviceLabel}
                               </span>
-                              <PriceInput row={promoRow} />
+                              <PriceInput row={promoRow} onChange={handlePriceChange} />
                             </div>
                             {hasValidNumbers && (
                               <p className="mt-1 text-right text-xs text-secondary-dark">
