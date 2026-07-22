@@ -93,24 +93,36 @@ export default function PricesPage() {
   async function handleSaveAll() {
     setError(null)
 
-    const payload = []
-    for (const row of prices) {
+    const changedRows = prices.filter((row) => {
+      const original = savedPrices.find((r) => r.id === row.id)
+      return Number(original?.price) !== Number(row.price)
+    })
+
+    const parsed = []
+    for (const row of changedRows) {
       const numericValue = parseFloat(row.price)
       if (Number.isNaN(numericValue)) {
         setError('Hay precios inválidos. Revisá los campos antes de guardar.')
         return
       }
-      payload.push({ id: row.id, price: numericValue })
+      parsed.push({ ...row, price: numericValue })
     }
 
     setSaving(true)
-    const { error: upsertError } = await supabase.from('prices').upsert(payload)
-    setSaving(false)
+    for (const row of parsed) {
+      const { error: updateError } = await supabase
+        .from('prices')
+        .update({ price: row.price })
+        .eq('service_type', row.service_type)
+        .eq('promo_type', row.promo_type)
 
-    if (upsertError) {
-      setError(`No se pudieron guardar los cambios: ${upsertError.message}`)
-      return
+      if (updateError) {
+        setSaving(false)
+        setError(`No se pudo guardar ${row.service_type}/${row.promo_type}: ${updateError.message}`)
+        return
+      }
     }
+    setSaving(false)
 
     const savedSnapshot = prices.map((row) => ({ ...row, price: parseFloat(row.price) }))
     setPrices(savedSnapshot)
