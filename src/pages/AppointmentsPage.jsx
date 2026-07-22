@@ -11,6 +11,8 @@ import {
 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { SERVICES, PROMOS, findPriceRow, serviceLabel, promoLabel } from '../lib/priceConstants'
+import { useAuth } from '../context/AuthContext'
+import { usePrices } from '../hooks/usePrices'
 
 const PROMO_OPTIONS = [{ key: 'normal', label: 'Ninguna' }, ...PROMOS]
 
@@ -51,7 +53,7 @@ function emptyForm(date, time) {
   }
 }
 
-function AppointmentModal({ initialForm, prices, onClose, onSaved, onDeleted }) {
+function AppointmentModal({ initialForm, prices, userId, onClose, onSaved, onDeleted }) {
   const [form, setForm] = useState(initialForm)
   const [saving, setSaving] = useState(false)
   const [modalError, setModalError] = useState(null)
@@ -85,7 +87,7 @@ function AppointmentModal({ initialForm, prices, onClose, onSaved, onDeleted }) 
 
     const query = form.id
       ? supabase.from('appointments').update(payload).eq('id', form.id)
-      : supabase.from('appointments').insert(payload)
+      : supabase.from('appointments').insert({ ...payload, user_id: userId })
 
     const { error } = await query.select().single()
 
@@ -285,26 +287,13 @@ function AppointmentModal({ initialForm, prices, onClose, onSaved, onDeleted }) 
 }
 
 export default function AppointmentsPage() {
+  const { user } = useAuth()
+  const { prices } = usePrices(user.id)
   const [selectedDate, setSelectedDate] = useState(todayISO())
   const [appointments, setAppointments] = useState([])
-  const [prices, setPrices] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [modalForm, setModalForm] = useState(null)
-
-  useEffect(() => {
-    let active = true
-
-    async function fetchPrices() {
-      const { data } = await supabase.from('prices').select('*')
-      if (active) setPrices(data ?? [])
-    }
-
-    fetchPrices()
-    return () => {
-      active = false
-    }
-  }, [])
 
   async function fetchAppointments() {
     setLoading(true)
@@ -487,6 +476,7 @@ export default function AppointmentsPage() {
         <AppointmentModal
           initialForm={modalForm}
           prices={prices}
+          userId={user.id}
           onClose={closeModal}
           onSaved={handleSaved}
           onDeleted={handleDeleted}

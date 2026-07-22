@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import { Loader2, AlertCircle, CheckCircle2 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { SERVICES, PROMOS, findPriceRow } from '../lib/priceConstants'
+import { useAuth } from '../context/AuthContext'
+import { usePrices } from '../hooks/usePrices'
 
 const MESSAGE_TIMEOUT_MS = 2500
 
@@ -29,39 +31,19 @@ function PriceInput({ row, onChange }) {
 }
 
 export default function PricesPage() {
-  const [prices, setPrices] = useState([])
+  const { user } = useAuth()
+  const { prices, setPrices, loading, error, setError } = usePrices(user.id)
   const [savedPrices, setSavedPrices] = useState([])
-  const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [error, setError] = useState(null)
   const [successMessage, setSuccessMessage] = useState(null)
   const messageTimer = useRef(null)
 
   useEffect(() => {
-    let active = true
-
-    async function fetchPrices() {
-      setLoading(true)
-      const { data, error: fetchError } = await supabase.from('prices').select('*')
-
-      if (!active) return
-
-      if (fetchError) {
-        setError(`No se pudieron cargar los precios: ${fetchError.message}`)
-      } else {
-        setPrices(data ?? [])
-        setSavedPrices(data ?? [])
-        setError(null)
-      }
-      setLoading(false)
+    if (!loading) {
+      setSavedPrices(prices.map((row) => ({ ...row })))
     }
-
-    fetchPrices()
-
-    return () => {
-      active = false
-    }
-  }, [])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading])
 
   const hasChanges = prices.some((row) => {
     const original = savedPrices.find((r) => r.id === row.id)
