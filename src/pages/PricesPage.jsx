@@ -24,7 +24,7 @@ function PriceInput({ row, onChange }) {
         inputMode="decimal"
         value={row.price ?? ''}
         onChange={(e) => onChange(row.id, e.target.value)}
-        className="w-full rounded-lg border border-accent/15 bg-white py-2 pl-7 pr-3 text-right font-medium text-accent focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+        className="w-full rounded-lg border border-primary/30 bg-input py-2 pl-7 pr-3 text-right font-medium text-accent focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
       />
     </div>
   )
@@ -118,14 +118,14 @@ export default function PricesPage() {
         <h1 className="text-3xl font-bold text-primary">Configuración de Precios</h1>
 
         {error && (
-          <div className="mt-4 flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+          <div className="mt-4 flex items-start gap-2 rounded-lg border border-red-900/60 bg-red-950/40 p-3 text-sm text-red-400">
             <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
             <span>{error}</span>
           </div>
         )}
 
         {successMessage && (
-          <div className="mt-4 flex items-start gap-2 rounded-lg border border-green-200 bg-green-50 p-3 text-sm text-green-700">
+          <div className="mt-4 flex items-start gap-2 rounded-lg border border-green-900/60 bg-green-950/40 p-3 text-sm text-green-400">
             <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
             <span>{successMessage}</span>
           </div>
@@ -142,7 +142,7 @@ export default function PricesPage() {
               <h2 className="text-lg font-semibold tracking-wide text-accent/80">
                 PRECIOS NORMALES
               </h2>
-              <div className="mt-3 divide-y divide-accent/10 rounded-xl border border-accent/10 bg-white shadow-sm">
+              <div className="mt-3 divide-y divide-primary/10 rounded-xl border border-primary/20 bg-card shadow-sm">
                 {SERVICES.map(({ key, label }) => {
                   const row = findPriceRow(prices, 'normal', key)
                   return (
@@ -163,7 +163,7 @@ export default function PricesPage() {
                 {PROMOS.map(({ key: promoKey, label, qty }) => (
                   <div
                     key={promoKey}
-                    className="rounded-xl border border-accent/10 bg-white p-5 shadow-sm"
+                    className="rounded-xl border border-primary/20 bg-card p-5 shadow-sm"
                   >
                     <h3 className="mb-4 font-semibold text-primary">{label}</h3>
                     <div className="space-y-4">
@@ -188,7 +188,7 @@ export default function PricesPage() {
                               <PriceInput row={promoRow} onChange={handlePriceChange} />
                             </div>
                             {hasValidNumbers && (
-                              <p className="mt-1 text-right text-xs text-secondary-dark">
+                              <p className="mt-1 text-right text-xs text-primary">
                                 Cada {serviceLabel.toLowerCase()} sale ${promoPerUnit.toFixed(2)}{' '}
                                 (Ahorras ${ahorras.toFixed(2)})
                               </p>
@@ -206,14 +206,14 @@ export default function PricesPage() {
               <button
                 onClick={handleCancel}
                 disabled={!hasChanges || saving}
-                className="rounded-lg border border-accent/15 px-5 py-2.5 text-sm font-medium text-accent hover:bg-accent/5 disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-lg border border-primary/20 px-5 py-2.5 text-sm font-medium text-accent hover:bg-primary/10 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Cancelar
               </button>
               <button
                 onClick={handleSaveAll}
                 disabled={!hasChanges || saving}
-                className="flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-white hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-black hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {saving && <Loader2 className="h-4 w-4 animate-spin" />}
                 Guardar cambios

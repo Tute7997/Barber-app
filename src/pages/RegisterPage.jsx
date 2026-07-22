@@ -60,7 +60,7 @@ export default function RegisterPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-surface p-4">
-      <div className="w-full max-w-md rounded-xl border border-accent/10 bg-white p-8 shadow-sm">
+      <div className="w-full max-w-md rounded-xl border border-primary/20 bg-card p-8 shadow-sm">
         <div className="flex flex-col items-center gap-2">
           <Scissors className="h-8 w-8 text-primary" />
           <h1 className="text-2xl font-bold text-primary">LuxeSalon</h1>
@@ -68,14 +68,14 @@ export default function RegisterPage() {
         </div>
 
         {error && (
-          <div className="mt-6 flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+          <div className="mt-6 flex items-start gap-2 rounded-lg border border-red-900/60 bg-red-950/40 p-3 text-sm text-red-400">
             <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
             <span>{error}</span>
           </div>
         )}
 
         {infoMessage && (
-          <div className="mt-6 flex items-start gap-2 rounded-lg border border-green-200 bg-green-50 p-3 text-sm text-green-700">
+          <div className="mt-6 flex items-start gap-2 rounded-lg border border-green-900/60 bg-green-950/40 p-3 text-sm text-green-400">
             <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
             <span>{infoMessage}</span>
           </div>
@@ -89,7 +89,7 @@ export default function RegisterPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="vos@ejemplo.com"
-              className="w-full rounded-lg border border-accent/15 p-2.5 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+              className="w-full rounded-lg border border-primary/30 bg-input p-2.5 text-accent placeholder:text-accent/40 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
             />
           </div>
           <div>
@@ -99,7 +99,7 @@ export default function RegisterPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Mínimo 6 caracteres"
-              className="w-full rounded-lg border border-accent/15 p-2.5 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+              className="w-full rounded-lg border border-primary/30 bg-input p-2.5 text-accent placeholder:text-accent/40 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
             />
           </div>
           <div>
@@ -111,14 +111,14 @@ export default function RegisterPage() {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full rounded-lg border border-accent/15 p-2.5 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+              className="w-full rounded-lg border border-primary/30 bg-input p-2.5 text-accent placeholder:text-accent/40 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
             />
           </div>
 
           <button
             type="submit"
             disabled={submitting}
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white hover:bg-primary-dark disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-black hover:bg-primary-dark disabled:opacity-50"
           >
             {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
             Crear cuenta

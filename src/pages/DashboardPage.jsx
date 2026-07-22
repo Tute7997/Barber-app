@@ -9,7 +9,7 @@ function todayISO() {
 
 function StatCard({ icon: Icon, label, value }) {
   return (
-    <div className="rounded-xl border border-accent/10 bg-white p-5 shadow-sm">
+    <div className="rounded-xl border border-primary/20 bg-card p-5 shadow-sm">
       <div className="flex items-center gap-3">
         <div className="rounded-lg bg-primary/10 p-2 text-primary">
           <Icon className="h-5 w-5" />
@@ -87,7 +87,7 @@ export default function DashboardPage() {
         <h1 className="text-3xl font-bold text-primary">Resumen del Día</h1>
 
         {error && (
-          <div className="mt-4 flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+          <div className="mt-4 flex items-start gap-2 rounded-lg border border-red-900/60 bg-red-950/40 p-3 text-sm text-red-400">
             <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
             <span>{error}</span>
           </div>
@@ -115,13 +115,13 @@ export default function DashboardPage() {
             </div>
 
             <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2">
-              <section className="rounded-xl border border-accent/10 bg-white p-5 shadow-sm">
+              <section className="rounded-xl border border-primary/20 bg-card p-5 shadow-sm">
                 <h2 className="mb-3 text-lg font-semibold text-accent/80">
                   Desglose por Servicio
                 </h2>
                 <table className="w-full text-left text-sm">
                   <thead>
-                    <tr className="border-b border-accent/10 text-xs uppercase tracking-wide text-accent/50">
+                    <tr className="border-b border-primary/10 text-xs uppercase tracking-wide text-accent/50">
                       <th className="py-2">Servicio</th>
                       <th className="py-2">Turnos</th>
                       <th className="py-2">Total</th>
@@ -129,7 +129,7 @@ export default function DashboardPage() {
                   </thead>
                   <tbody>
                     {byService.map((row) => (
-                      <tr key={row.key} className="border-b border-accent/5 last:border-0">
+                      <tr key={row.key} className="border-b border-primary/5 last:border-0">
                         <td className="py-2 font-medium text-accent">{row.label}</td>
                         <td className="py-2">{row.count}</td>
                         <td className="py-2">${row.total.toFixed(2)}</td>
@@ -139,13 +139,13 @@ export default function DashboardPage() {
                 </table>
               </section>
 
-              <section className="rounded-xl border border-accent/10 bg-white p-5 shadow-sm">
+              <section className="rounded-xl border border-primary/20 bg-card p-5 shadow-sm">
                 <h2 className="mb-3 text-lg font-semibold text-accent/80">
                   Desglose por Promoción
                 </h2>
                 <table className="w-full text-left text-sm">
                   <thead>
-                    <tr className="border-b border-accent/10 text-xs uppercase tracking-wide text-accent/50">
+                    <tr className="border-b border-primary/10 text-xs uppercase tracking-wide text-accent/50">
                       <th className="py-2">Promoción</th>
                       <th className="py-2">Turnos</th>
                       <th className="py-2">Total</th>
@@ -153,7 +153,7 @@ export default function DashboardPage() {
                   </thead>
                   <tbody>
                     {byPromo.map((row) => (
-                      <tr key={row.key} className="border-b border-accent/5 last:border-0">
+                      <tr key={row.key} className="border-b border-primary/5 last:border-0">
                         <td className="py-2 font-medium text-accent">{row.label}</td>
                         <td className="py-2">{row.count}</td>
                         <td className="py-2">${row.total.toFixed(2)}</td>

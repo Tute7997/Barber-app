@@ -6,6 +6,7 @@ import RegisterPage from './pages/RegisterPage'
 import DashboardPage from './pages/DashboardPage'
 import AppointmentsPage from './pages/AppointmentsPage'
 import PricesPage from './pages/PricesPage'
+import SettingsPage from './pages/SettingsPage'
 
 function RootRedirect() {
   const { user, loading } = useAuth()
@@ -42,6 +43,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <PricesPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute>
+                <SettingsPage />
               </ProtectedRoute>
             }
           />
