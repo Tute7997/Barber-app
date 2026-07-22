@@ -3,15 +3,15 @@ import { Loader2, AlertCircle, CheckCircle2 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { SERVICES, PROMOS, findPriceRow } from '../lib/priceConstants'
 
-const DEBOUNCE_MS = 400
 const MESSAGE_TIMEOUT_MS = 2500
 
 export default function PricesPage() {
   const [prices, setPrices] = useState([])
+  const [savedPrices, setSavedPrices] = useState([])
   const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
   const [error, setError] = useState(null)
   const [successMessage, setSuccessMessage] = useState(null)
-  const timers = useRef({})
   const messageTimer = useRef(null)
 
   useEffect(() => {
@@ -27,6 +27,7 @@ export default function PricesPage() {
         setError(`No se pudieron cargar los precios: ${fetchError.message}`)
       } else {
         setPrices(data ?? [])
+        setSavedPrices(data ?? [])
         setError(null)
       }
       setLoading(false)
@@ -38,6 +39,11 @@ export default function PricesPage() {
       active = false
     }
   }, [])
+
+  const hasChanges = prices.some((row) => {
+    const original = savedPrices.find((r) => r.id === row.id)
+    return Number(original?.price) !== Number(row.price)
+  })
 
   function flashSuccess(message) {
     setSuccessMessage(message)
@@ -51,28 +57,40 @@ export default function PricesPage() {
     setPrices((prev) =>
       prev.map((row) => (row.id === rowId ? { ...row, price: rawValue } : row)),
     )
+  }
 
-    clearTimeout(timers.current[rowId])
-    timers.current[rowId] = setTimeout(async () => {
-      const numericValue = parseFloat(rawValue)
-      if (Number.isNaN(numericValue)) return
+  function handleCancel() {
+    setPrices(savedPrices.map((row) => ({ ...row })))
+    setError(null)
+    setSuccessMessage(null)
+  }
 
-      const { data, error: updateError } = await supabase
-        .from('prices')
-        .update({ price: numericValue })
-        .eq('id', rowId)
-        .select()
-        .single()
+  async function handleSaveAll() {
+    setError(null)
 
-      if (updateError) {
-        setError(`No se pudo guardar el cambio: ${updateError.message}`)
-      } else if (!data) {
-        setError('No se encontró el precio para actualizar (ID inválido).')
-      } else {
-        setError(null)
-        flashSuccess('Precio actualizado')
+    const payload = []
+    for (const row of prices) {
+      const numericValue = parseFloat(row.price)
+      if (Number.isNaN(numericValue)) {
+        setError('Hay precios inválidos. Revisá los campos antes de guardar.')
+        return
       }
-    }, DEBOUNCE_MS)
+      payload.push({ id: row.id, price: numericValue })
+    }
+
+    setSaving(true)
+    const { error: upsertError } = await supabase.from('prices').upsert(payload)
+    setSaving(false)
+
+    if (upsertError) {
+      setError(`No se pudieron guardar los cambios: ${upsertError.message}`)
+      return
+    }
+
+    const savedSnapshot = prices.map((row) => ({ ...row, price: parseFloat(row.price) }))
+    setPrices(savedSnapshot)
+    setSavedPrices(savedSnapshot)
+    flashSuccess('Cambios guardados correctamente')
   }
 
   function PriceInput({ row }) {
@@ -181,6 +199,24 @@ export default function PricesPage() {
                 ))}
               </div>
             </section>
+
+            <div className="mt-10 flex justify-end gap-3">
+              <button
+                onClick={handleCancel}
+                disabled={!hasChanges || saving}
+                className="rounded-lg border border-accent/15 px-5 py-2.5 text-sm font-medium text-accent hover:bg-accent/5 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleSaveAll}
+                disabled={!hasChanges || saving}
+                className="flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-white hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {saving && <Loader2 className="h-4 w-4 animate-spin" />}
+                Guardar cambios
+              </button>
+            </div>
           </>
         )}
       </div>
